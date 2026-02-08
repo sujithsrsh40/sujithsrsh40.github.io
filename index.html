@@ -29,34 +29,32 @@ body{
   to{transform:translateY(-110vh) scale(1.4);opacity:0;}
 }
 
+/* shake */
+@keyframes shake{
+  0%{transform:translate(0,0)}
+  25%{transform:translate(-2px,1px)}
+  50%{transform:translate(2px,-1px)}
+  75%{transform:translate(-1px,2px)}
+  100%{transform:translate(0,0)}
+}
+
 .card{
   background:white;
   width:90%;
   max-width:340px;
-  padding:25px 20px 35px;
+  padding:25px 20px 45px;
   border-radius:20px;
   text-align:center;
-  position:relative; /* IMPORTANT */
+  position:relative;
   z-index:2;
 }
 
-.tease{
-  position:absolute;
-  bottom:-30px;
-  width:100%;
-  text-align:center;
-  font-size:14px;
-  color:#999;
-  font-style:italic;
-  user-select:none;
-}
-  
 h1{color:#ff4f7a;margin:5px 0;}
 p{font-size:18px;margin:15px 0 20px;}
 
 .photo{
   display:none;
-  height:180px;
+  height:200px;
   border-radius:15px;
   overflow:hidden;
   margin-bottom:15px;
@@ -66,8 +64,9 @@ p{font-size:18px;margin:15px 0 20px;}
   width:100%;
   height:100%;
   object-fit:contain;
-  background:white; /* optional, looks nice */
+  background:white;
 }
+
 @keyframes fadeIn{
   from{opacity:0;transform:scale(.95)}
   to{opacity:1}
@@ -75,7 +74,7 @@ p{font-size:18px;margin:15px 0 20px;}
 
 .buttons{
   position:relative;
-  height:90px;
+  height:110px;
 }
 
 button{
@@ -88,22 +87,33 @@ button{
   position:absolute;
 }
 
-/* YES — fixed position */
+/* YES */
 #yesBtn{
   background:#ff4f7a;
   color:white;
   left:50%;
-  bottom:10px;
+  bottom:35px;
   transform:translateX(10px);
 }
 
-/* NO — starts beside YES */
+/* NO */
 #noBtn{
   background:#ddd;
   color:#555;
   left:50%;
-  bottom:10px;
+  bottom:35px;
   transform:translateX(-130px);
+}
+
+.tease{
+  position:absolute;
+  bottom:5px;
+  width:100%;
+  text-align:center;
+  font-size:14px;
+  color:#999;
+  font-style:italic;
+  user-select:none;
 }
 
 .result{
@@ -126,11 +136,10 @@ button{
   <p>Will you be my valentine? 👉🏻👈🏻</p>
 
   <div class="buttons">
-  <button id="noBtn">No 🙈</button>
-  <button id="yesBtn">Yes 💘</button>
-
-  <div class="tease">Click no, I dare you 😏</div>
-</div>
+    <button id="noBtn">No 🙈</button>
+    <button id="yesBtn">Yes 💘</button>
+    <div class="tease" id="tease">Click no, I dare you 😏</div>
+  </div>
 
   <div class="result" id="result">
     I knew you’d say yes! 🥰💛
@@ -143,8 +152,10 @@ const noBtn  = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
 const photo  = document.getElementById("photo");
 const result = document.getElementById("result");
+const tease  = document.getElementById("tease");
 
-/* Get YES rectangle relative to CARD */
+let noCount = 0;
+
 function getYesRect(){
   return {
     x: yesBtn.offsetLeft,
@@ -154,7 +165,6 @@ function getYesRect(){
   };
 }
 
-/* Rectangle intersection check */
 function overlaps(r1, r2){
   return !(
     r1.x + r1.w < r2.x ||
@@ -165,6 +175,23 @@ function overlaps(r1, r2){
 }
 
 function moveNo(){
+  noCount++;
+
+  const messages = [
+    "Click no, I dare you 😏",
+    "Bold choice… 👀",
+    "You’re enjoying this too much 😌",
+    "Okay now you’re just flirting 😳",
+    "Just click yes already 🙄💛"
+  ];
+  tease.innerText = messages[Math.min(noCount, messages.length-1)];
+
+  // tired button effects
+  noBtn.style.animation = "shake .3s";
+  noBtn.style.transform = `scale(${Math.max(0.85, 1 - noCount*0.03)})`;
+
+  setTimeout(()=>noBtn.style.animation="",300);
+
   const cardW = card.clientWidth;
   const cardH = card.clientHeight;
   const yes   = getYesRect();
@@ -174,9 +201,8 @@ function moveNo(){
   do{
     x = Math.random() * (cardW - noBtn.offsetWidth);
     y = Math.random() * (cardH - noBtn.offsetHeight);
-
     tries++;
-    if(tries > 50) break; // safety
+    if(tries > 50) break;
   }
   while(
     overlaps(
@@ -187,8 +213,6 @@ function moveNo(){
 
   noBtn.style.left = x + "px";
   noBtn.style.top  = y + "px";
-  noBtn.style.transform = "none";
-  noBtn.style.transition = "left .15s ease, top .15s ease";
 }
 
 noBtn.addEventListener("mouseenter", moveNo);
@@ -196,20 +220,24 @@ noBtn.addEventListener("touchstart", moveNo);
 
 yesBtn.onclick = () => {
   document.querySelector(".buttons").style.display = "none";
+  tease.style.display = "none";
   photo.style.display = "block";
   result.style.display = "block";
 };
 
-/* hearts */
+// escalating hearts
 setInterval(()=>{
-  const h=document.createElement("div");
-  h.className="heart";
-  h.innerText=Math.random()>0.5?"💖":"💛";
-  h.style.left=Math.random()*100+"vw";
-  h.style.fontSize=16+Math.random()*20+"px";
-  h.style.animationDuration=4+Math.random()*3+"s";
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(),7000);
+  const count = Math.min(noCount + 1, 6);
+  for(let i=0;i<count;i++){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerText=Math.random()>0.5?"💖":"💛";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=16+Math.random()*20+"px";
+    h.style.animationDuration=4+Math.random()*3+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),7000);
+  }
 },450);
 </script>
 
