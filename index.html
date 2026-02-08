@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Veena 💖</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:'Segoe UI',sans-serif;
+  background:linear-gradient(135deg,#ff758c,#ff7eb3);
+  overflow:hidden;
+}
+
+/* floating hearts */
+.heart{
+  position:fixed;
+  bottom:-20px;
+  animation:floatUp 6s linear infinite;
+  pointer-events:none;
+}
+@keyframes floatUp{
+  from{transform:translateY(0) scale(1);opacity:1;}
+  to{transform:translateY(-110vh) scale(1.4);opacity:0;}
+}
+
+.card{
+  background:white;
+  width:90%;
+  max-width:340px;
+  padding:25px 20px 35px;
+  border-radius:20px;
+  text-align:center;
+  position:relative;
+  z-index:2;
+}
+
+h1{color:#ff4f7a;margin:5px 0;}
+p{font-size:18px;margin:15px 0 20px;}
+
+.photo{
+  display:none;
+  height:180px;
+  border-radius:15px;
+  overflow:hidden;
+  margin-bottom:15px;
+  animation:fadeIn .8s ease;
+}
+.photo img{width:100%;height:100%;object-fit:cover;}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1}}
+
+.buttons{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  margin-top:10px;
+  position:relative;
+  height:70px;
+}
+
+button{
+  flex:1;
+  padding:12px 0;
+  font-size:16px;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+}
+
+#yesBtn{
+  background:#ff4f7a;
+  color:white;
+  z-index:2;
+}
+
+#noBtn{
+  background:#ddd;
+  color:#555;
+  position:relative;
+  z-index:1;
+}
+
+.result{
+  display:none;
+  font-size:22px;
+  color:#ff4f7a;
+  margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+  <div class="photo" id="photo">
+    <img src="photo.jpg">
+  </div>
+
+  <h1>Veena 💖</h1>
+  <p>Will you be my valentine? 👉🏻👈🏻</p>
+
+  <div class="buttons" id="btnBox">
+    <button id="noBtn">No 🙈</button>
+    <button id="yesBtn">Yes 💘</button>
+  </div>
+
+  <div class="result" id="result">
+    I knew you’d say yes! 🥰💛
+  </div>
+</div>
+
+<script>
+const noBtn=document.getElementById("noBtn");
+const yesBtn=document.getElementById("yesBtn");
+const card=document.getElementById("card");
+const btnBox=document.getElementById("btnBox");
+const photo=document.getElementById("photo");
+const result=document.getElementById("result");
+
+function moveNo(){
+  const cardRect=card.getBoundingClientRect();
+  const yesRect=yesBtn.getBoundingClientRect();
+
+  noBtn.style.position="absolute";
+
+  let x,y,hit;
+  do{
+    x=Math.random()*(cardRect.width-noBtn.offsetWidth);
+    y=Math.random()*(cardRect.height-noBtn.offsetHeight-40);
+
+    const noRect={
+      left:cardRect.left+x,
+      right:cardRect.left+x+noBtn.offsetWidth,
+      top:cardRect.top+y,
+      bottom:cardRect.top+y+noBtn.offsetHeight
+    };
+
+    hit=!(
+      noRect.right<yesRect.left-10||
+      noRect.left>yesRect.right+10||
+      noRect.bottom<yesRect.top-10||
+      noRect.top>yesRect.bottom+10
+    );
+  }while(hit);
+
+  noBtn.style.left=x+"px";
+  noBtn.style.top=y+"px";
+}
+
+noBtn.addEventListener("mouseenter",moveNo);
+noBtn.addEventListener("touchstart",moveNo);
+
+yesBtn.onclick=()=>{
+  btnBox.style.display="none";
+  photo.style.display="block";
+  result.style.display="block";
+};
+
+setInterval(()=>{
+  const h=document.createElement("div");
+  h.className="heart";
+  h.innerText=Math.random()>0.5?"💖":"💛";
+  h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=16+Math.random()*20+"px";
+  h.style.animationDuration=4+Math.random()*3+"s";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),7000);
+},450);
+</script>
+
+</body>
+</html>
