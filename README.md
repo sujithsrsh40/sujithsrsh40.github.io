@@ -21,16 +21,16 @@
       position: fixed;
       bottom: -20px;
       color: rgba(255,255,255,0.8);
-      font-size: 20px;
       animation: floatUp 6s linear infinite;
+      z-index: 1;
     }
 
     @keyframes floatUp {
-      0% {
+      from {
         transform: translateY(0) scale(1);
         opacity: 1;
       }
-      100% {
+      to {
         transform: translateY(-110vh) scale(1.5);
         opacity: 0;
       }
@@ -49,23 +49,24 @@
     }
 
     h1 {
-      margin: 10px 0 5px;
-      font-size: 26px;
       color: #ff4f7a;
+      margin: 5px 0;
     }
 
     p {
-      margin: 15px 0 20px;
       font-size: 18px;
-      color: #333;
+      margin: 15px 0 20px;
     }
 
+    /* Photo hidden initially */
     .photo {
+      display: none;
       width: 100%;
       height: 180px;
       border-radius: 15px;
       overflow: hidden;
       margin-bottom: 15px;
+      animation: fadeIn 0.8s ease forwards;
     }
 
     .photo img {
@@ -74,9 +75,14 @@
       object-fit: cover;
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
     .buttons {
       position: relative;
-      height: 120px;
+      height: 90px;
     }
 
     button {
@@ -99,7 +105,7 @@
     #noBtn {
       background: #ddd;
       color: #555;
-      left: 20px;
+      left: 25%;
       top: 10px;
     }
 
@@ -107,43 +113,46 @@
       display: none;
       font-size: 22px;
       color: #ff4f7a;
-      margin-top: 20px;
+      margin-top: 15px;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Card -->
   <div class="card">
-    <div class="photo">
-      <!-- 🔁 Replace photo.jpg with your image filename -->
+    <!-- Photo appears only after YES -->
+    <div class="photo" id="photo">
       <img src="photo.jpg" alt="Us 💕">
     </div>
 
     <h1>Veena 💖</h1>
-    <p>Will you go on a date with me?</p>
+    <p>Will you be my valentine? 👉🏻👈🏻</p>
 
-    <div class="buttons">
+    <div class="buttons" id="buttonBox">
       <button id="yesBtn">Yes 💘</button>
       <button id="noBtn">No 🙈</button>
     </div>
 
     <div class="result" id="result">
-      It’s a date then! 💕🥰
+      I knew you'd say yes! 💕🥰
     </div>
   </div>
 
   <script>
-    // Moving NO button
     const noBtn = document.getElementById("noBtn");
     const yesBtn = document.getElementById("yesBtn");
     const result = document.getElementById("result");
+    const photo = document.getElementById("photo");
+    const buttonBox = document.getElementById("buttonBox");
 
+    // Keep NO button within a small safe area
     function moveButton() {
-      const card = document.querySelector(".card");
-      const maxX = card.clientWidth - noBtn.offsetWidth;
-      const maxY = card.clientHeight - noBtn.offsetHeight;
+      const boxWidth = buttonBox.clientWidth;
+      const boxHeight = buttonBox.clientHeight;
+
+      const maxX = boxWidth - noBtn.offsetWidth;
+      const maxY = boxHeight - noBtn.offsetHeight;
 
       const x = Math.random() * maxX;
       const y = Math.random() * maxY;
@@ -156,27 +165,25 @@
     noBtn.addEventListener("touchstart", moveButton);
 
     yesBtn.addEventListener("click", () => {
-      document.querySelector(".buttons").style.display = "none";
+      buttonBox.style.display = "none";
+      photo.style.display = "block";
       result.style.display = "block";
     });
 
-    // Floating hearts generator
+    // Floating hearts
     function createHeart() {
       const heart = document.createElement("div");
-      heart.classList.add("heart");
+      heart.className = "heart";
       heart.innerText = "💖";
       heart.style.left = Math.random() * 100 + "vw";
-      heart.style.fontSize = (16 + Math.random() * 20) + "px";
-      heart.style.animationDuration = (4 + Math.random() * 3) + "s";
-
+      heart.style.fontSize = 16 + Math.random() * 20 + "px";
+      heart.style.animationDuration = 4 + Math.random() * 3 + "s";
       document.body.appendChild(heart);
-
-      setTimeout(() => {
-        heart.remove();
-      }, 7000);
+      setTimeout(() => heart.remove(), 7000);
     }
 
-    setInterval(createHeart, 400);
+    setInterval(createHeart, 450);
   </script>
+
 </body>
 </html>
