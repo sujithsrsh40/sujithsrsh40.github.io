@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -24,6 +23,7 @@
       color: rgba(255,255,255,0.8);
       animation: floatUp 6s linear infinite;
       z-index: 1;
+      pointer-events: none;
     }
 
     @keyframes floatUp {
@@ -75,18 +75,10 @@
       to { opacity: 1; transform: scale(1); }
     }
 
-    /* Button area split into two lanes */
     .buttons {
-      display: flex;
-      justify-content: space-between;
       position: relative;
-      height: 80px;
+      height: 120px;
       margin-top: 10px;
-    }
-
-    .lane {
-      width: 48%;
-      position: relative;
     }
 
     button {
@@ -96,19 +88,22 @@
       border-radius: 30px;
       cursor: pointer;
       position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      top: 10px;
+      white-space: nowrap;
     }
 
     #yesBtn {
       background: #ff4f7a;
       color: white;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
     }
 
     #noBtn {
       background: #ddd;
       color: #555;
+      top: 10px;
+      left: 20px;
     }
 
     .result {
@@ -122,51 +117,64 @@
 
 <body>
 
-  <div class="card">
+  <div class="card" id="card">
     <div class="photo" id="photo">
       <img src="photo.jpg" alt="Us 💕">
     </div>
 
     <h1>Veena 💖</h1>
-    <p>Will you go on a date with me?</p>
+    <p id="question">Will you be my valentine? 👉🏻👈🏻</p>
 
     <div class="buttons" id="buttonBox">
-      <div class="lane" id="noLane">
-        <button id="noBtn">No 🙈</button>
-      </div>
-      <div class="lane">
-        <button id="yesBtn">Yes 💘</button>
-      </div>
+      <button id="yesBtn">Yes 💘</button>
+      <button id="noBtn">No 🙈</button>
     </div>
 
     <div class="result" id="result">
-      It’s a date then! 💕🥰
+      I knew you’d say yes! 🥰💛
     </div>
   </div>
 
   <script>
     const noBtn = document.getElementById("noBtn");
-    const noLane = document.getElementById("noLane");
     const yesBtn = document.getElementById("yesBtn");
-    const photo = document.getElementById("photo");
+    const card = document.getElementById("card");
     const buttonBox = document.getElementById("buttonBox");
+    const photo = document.getElementById("photo");
     const result = document.getElementById("result");
 
-    // NO button moves ONLY inside its own lane
-    function moveButton() {
-      const maxX = noLane.clientWidth - noBtn.offsetWidth;
-      const maxY = noLane.clientHeight - noBtn.offsetHeight;
+    function moveNoButton() {
+      const cardRect = card.getBoundingClientRect();
+      const yesRect = yesBtn.getBoundingClientRect();
 
-      const x = Math.random() * maxX;
-      const y = Math.random() * maxY;
+      let x, y, overlap;
 
-      noBtn.style.left = `${x + noBtn.offsetWidth / 2}px`;
-      noBtn.style.top = `${y}px`;
-      noBtn.style.transform = "translateX(0)";
+      do {
+        x = Math.random() * (card.clientWidth - noBtn.offsetWidth);
+        y = Math.random() * (card.clientHeight - noBtn.offsetHeight - 40);
+
+        const noRect = {
+          left: cardRect.left + x,
+          right: cardRect.left + x + noBtn.offsetWidth,
+          top: cardRect.top + y,
+          bottom: cardRect.top + y + noBtn.offsetHeight
+        };
+
+        overlap = !(
+          noRect.right < yesRect.left ||
+          noRect.left > yesRect.right ||
+          noRect.bottom < yesRect.top ||
+          noRect.top > yesRect.bottom
+        );
+
+      } while (overlap);
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
     }
 
-    noBtn.addEventListener("mouseenter", moveButton);
-    noBtn.addEventListener("touchstart", moveButton);
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("touchstart", moveNoButton);
 
     yesBtn.addEventListener("click", () => {
       buttonBox.style.display = "none";
@@ -178,7 +186,7 @@
     function createHeart() {
       const heart = document.createElement("div");
       heart.className = "heart";
-      heart.innerText = Math.random() > 0.5 ? "💖" : "💘";
+      heart.innerText = Math.random() > 0.5 ? "💖" : "💛";
       heart.style.left = Math.random() * 100 + "vw";
       heart.style.fontSize = 16 + Math.random() * 20 + "px";
       heart.style.animationDuration = 4 + Math.random() * 3 + "s";
