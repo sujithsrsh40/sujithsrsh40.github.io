@@ -52,7 +52,10 @@ p{font-size:18px;margin:15px 0 20px;}
   animation:fadeIn .8s ease;
 }
 .photo img{width:100%;height:100%;object-fit:cover;}
-@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1}}
+@keyframes fadeIn{
+  from{opacity:0;transform:scale(.95)}
+  to{opacity:1}
+}
 
 .buttons{
   position:relative;
@@ -69,20 +72,24 @@ button{
   position:absolute;
 }
 
+/* YES button */
 #yesBtn{
   background:#ff4f7a;
   color:white;
   left:50%;
   transform:translateX(10px);
   bottom:10px;
+  z-index:1; /* stays below NO */
 }
 
+/* NO button */
 #noBtn{
   background:#ddd;
   color:#555;
   left:50%;
   transform:translateX(-130px);
   bottom:10px;
+  z-index:5; /* ALWAYS on top */
 }
 
 .result{
@@ -98,7 +105,7 @@ button{
 
 <div class="card" id="card">
   <div class="photo" id="photo">
-    <img src="photo.jpg">
+    <img src="photo.jpg" alt="Us 💕">
   </div>
 
   <h1>Veena 💖</h1>
@@ -126,7 +133,7 @@ function moveNo(){
   const cardRect = card.getBoundingClientRect();
   const yesRect = yesBtn.getBoundingClientRect();
 
-  let x,y,overlap;
+  let x, y, overlap;
 
   do{
     x = Math.random() * (card.clientWidth - noBtn.offsetWidth);
@@ -140,16 +147,17 @@ function moveNo(){
     };
 
     overlap = !(
-      noRect.right < yesRect.left - 8 ||
-      noRect.left > yesRect.right + 8 ||
-      noRect.bottom < yesRect.top - 8 ||
-      noRect.top > yesRect.bottom + 8
+      noRect.right < yesRect.left - 25 ||
+      noRect.left > yesRect.right + 25 ||
+      noRect.bottom < yesRect.top - 25 ||
+      noRect.top > yesRect.bottom + 25
     );
   } while(overlap);
 
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
   noBtn.style.transform = "none";
+  noBtn.style.transition = "left 0.15s ease, top 0.15s ease";
 }
 
 noBtn.addEventListener("mouseenter", moveNo);
@@ -161,13 +169,14 @@ yesBtn.onclick = () => {
   result.style.display = "block";
 };
 
+/* Floating hearts generator */
 setInterval(()=>{
-  const h=document.createElement("div");
-  h.className="heart";
-  h.innerText=Math.random()>0.5?"💖":"💛";
-  h.style.left=Math.random()*100+"vw";
-  h.style.fontSize=16+Math.random()*20+"px";
-  h.style.animationDuration=4+Math.random()*3+"s";
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.innerText = Math.random() > 0.5 ? "💖" : "💛";
+  h.style.left = Math.random() * 100 + "vw";
+  h.style.fontSize = 16 + Math.random() * 20 + "px";
+  h.style.animationDuration = 4 + Math.random() * 3 + "s";
   document.body.appendChild(h);
   setTimeout(()=>h.remove(),7000);
 },450);
