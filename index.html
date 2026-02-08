@@ -17,7 +17,7 @@ body{
   overflow:hidden;
 }
 
-/* floating hearts */
+/* Floating hearts */
 .heart{
   position:fixed;
   bottom:-20px;
@@ -55,34 +55,34 @@ p{font-size:18px;margin:15px 0 20px;}
 @keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1}}
 
 .buttons{
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  margin-top:10px;
   position:relative;
-  height:70px;
+  height:90px;
 }
 
 button{
-  flex:1;
+  width:120px;
   padding:12px 0;
   font-size:16px;
   border:none;
   border-radius:30px;
   cursor:pointer;
+  position:absolute;
 }
 
 #yesBtn{
   background:#ff4f7a;
   color:white;
-  z-index:2;
+  left:50%;
+  transform:translateX(10px);
+  bottom:10px;
 }
 
 #noBtn{
   background:#ddd;
   color:#555;
-  position:relative;
-  z-index:1;
+  left:50%;
+  transform:translateX(-130px);
+  bottom:10px;
 }
 
 .result{
@@ -115,50 +115,50 @@ button{
 </div>
 
 <script>
-const noBtn=document.getElementById("noBtn");
-const yesBtn=document.getElementById("yesBtn");
-const card=document.getElementById("card");
-const btnBox=document.getElementById("btnBox");
-const photo=document.getElementById("photo");
-const result=document.getElementById("result");
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const card = document.getElementById("card");
+const btnBox = document.getElementById("btnBox");
+const photo = document.getElementById("photo");
+const result = document.getElementById("result");
 
 function moveNo(){
-  const cardRect=card.getBoundingClientRect();
-  const yesRect=yesBtn.getBoundingClientRect();
+  const cardRect = card.getBoundingClientRect();
+  const yesRect = yesBtn.getBoundingClientRect();
 
-  noBtn.style.position="absolute";
+  let x,y,overlap;
 
-  let x,y,hit;
   do{
-    x=Math.random()*(cardRect.width-noBtn.offsetWidth);
-    y=Math.random()*(cardRect.height-noBtn.offsetHeight-40);
+    x = Math.random() * (card.clientWidth - noBtn.offsetWidth);
+    y = Math.random() * (card.clientHeight - noBtn.offsetHeight - 40);
 
-    const noRect={
-      left:cardRect.left+x,
-      right:cardRect.left+x+noBtn.offsetWidth,
-      top:cardRect.top+y,
-      bottom:cardRect.top+y+noBtn.offsetHeight
+    const noRect = {
+      left: cardRect.left + x,
+      right: cardRect.left + x + noBtn.offsetWidth,
+      top: cardRect.top + y,
+      bottom: cardRect.top + y + noBtn.offsetHeight
     };
 
-    hit=!(
-      noRect.right<yesRect.left-10||
-      noRect.left>yesRect.right+10||
-      noRect.bottom<yesRect.top-10||
-      noRect.top>yesRect.bottom+10
+    overlap = !(
+      noRect.right < yesRect.left - 8 ||
+      noRect.left > yesRect.right + 8 ||
+      noRect.bottom < yesRect.top - 8 ||
+      noRect.top > yesRect.bottom + 8
     );
-  }while(hit);
+  } while(overlap);
 
-  noBtn.style.left=x+"px";
-  noBtn.style.top=y+"px";
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+  noBtn.style.transform = "none";
 }
 
-noBtn.addEventListener("mouseenter",moveNo);
-noBtn.addEventListener("touchstart",moveNo);
+noBtn.addEventListener("mouseenter", moveNo);
+noBtn.addEventListener("touchstart", moveNo);
 
-yesBtn.onclick=()=>{
-  btnBox.style.display="none";
-  photo.style.display="block";
-  result.style.display="block";
+yesBtn.onclick = () => {
+  btnBox.style.display = "none";
+  photo.style.display = "block";
+  result.style.display = "block";
 };
 
 setInterval(()=>{
