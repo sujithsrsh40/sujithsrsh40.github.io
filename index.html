@@ -17,7 +17,7 @@ body{
   overflow:hidden;
 }
 
-/* Floating hearts */
+/* floating hearts */
 .heart{
   position:fixed;
   bottom:-20px;
@@ -36,7 +36,7 @@ body{
   padding:25px 20px 35px;
   border-radius:20px;
   text-align:center;
-  position:relative;
+  position:relative; /* IMPORTANT */
   z-index:2;
 }
 
@@ -72,24 +72,22 @@ button{
   position:absolute;
 }
 
-/* YES button */
+/* YES — fixed position */
 #yesBtn{
   background:#ff4f7a;
   color:white;
   left:50%;
-  transform:translateX(10px);
   bottom:10px;
-  z-index:1; /* stays below NO */
+  transform:translateX(10px);
 }
 
-/* NO button */
+/* NO — starts beside YES */
 #noBtn{
   background:#ddd;
   color:#555;
   left:50%;
-  transform:translateX(-130px);
   bottom:10px;
-  z-index:5; /* ALWAYS on top */
+  transform:translateX(-130px);
 }
 
 .result{
@@ -111,7 +109,7 @@ button{
   <h1>Veena 💖</h1>
   <p>Will you be my valentine? 👉🏻👈🏻</p>
 
-  <div class="buttons" id="btnBox">
+  <div class="buttons">
     <button id="noBtn">No 🙈</button>
     <button id="yesBtn">Yes 💘</button>
   </div>
@@ -122,61 +120,76 @@ button{
 </div>
 
 <script>
-const noBtn = document.getElementById("noBtn");
+const card   = document.getElementById("card");
+const noBtn  = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
-const card = document.getElementById("card");
-const btnBox = document.getElementById("btnBox");
-const photo = document.getElementById("photo");
+const photo  = document.getElementById("photo");
 const result = document.getElementById("result");
 
-function moveNo(){
-  const cardRect = card.getBoundingClientRect();
-  const yesRect = yesBtn.getBoundingClientRect();
+/* Get YES rectangle relative to CARD */
+function getYesRect(){
+  return {
+    x: yesBtn.offsetLeft,
+    y: yesBtn.offsetTop,
+    w: yesBtn.offsetWidth,
+    h: yesBtn.offsetHeight
+  };
+}
 
-  let x, y, overlap;
+/* Rectangle intersection check */
+function overlaps(r1, r2){
+  return !(
+    r1.x + r1.w < r2.x ||
+    r1.x > r2.x + r2.w ||
+    r1.y + r1.h < r2.y ||
+    r1.y > r2.y + r2.h
+  );
+}
+
+function moveNo(){
+  const cardW = card.clientWidth;
+  const cardH = card.clientHeight;
+  const yes   = getYesRect();
+
+  let x, y, tries = 0;
 
   do{
-    x = Math.random() * (card.clientWidth - noBtn.offsetWidth);
-    y = Math.random() * (card.clientHeight - noBtn.offsetHeight - 40);
+    x = Math.random() * (cardW - noBtn.offsetWidth);
+    y = Math.random() * (cardH - noBtn.offsetHeight);
 
-    const noRect = {
-      left: cardRect.left + x,
-      right: cardRect.left + x + noBtn.offsetWidth,
-      top: cardRect.top + y,
-      bottom: cardRect.top + y + noBtn.offsetHeight
-    };
-
-    overlap = !(
-      noRect.right < yesRect.left - 25 ||
-      noRect.left > yesRect.right + 25 ||
-      noRect.bottom < yesRect.top - 25 ||
-      noRect.top > yesRect.bottom + 25
-    );
-  } while(overlap);
+    tries++;
+    if(tries > 50) break; // safety
+  }
+  while(
+    overlaps(
+      { x, y, w:noBtn.offsetWidth, h:noBtn.offsetHeight },
+      { x:yes.x-15, y:yes.y-15, w:yes.w+30, h:yes.h+30 }
+    )
+  );
 
   noBtn.style.left = x + "px";
-  noBtn.style.top = y + "px";
+  noBtn.style.top  = y + "px";
   noBtn.style.transform = "none";
-  noBtn.style.transition = "left 0.15s ease, top 0.15s ease";
+  noBtn.style.transition = "left .15s ease, top .15s ease";
 }
 
 noBtn.addEventListener("mouseenter", moveNo);
 noBtn.addEventListener("touchstart", moveNo);
 
 yesBtn.onclick = () => {
-  btnBox.style.display = "none";
+  document.querySelector(".buttons").style.display = "none";
   photo.style.display = "block";
   result.style.display = "block";
 };
 
-/* Floating hearts generator */
+/* hearts */
 setInterval(()=>{
-  const h = document.createElement("div");
-  h.className = "heart";
-  h.innerText = Math.random() > 0.5 ? "💖" : "💛";
-  h.style.left = Math.random() * 100 + "vw";
-  h.style.fontSize = 16 + Math.random() * 20 + "px";
-  h.style.animationDuration = 4 + Math.random() * 3 + "s";
+  const h=document.createElement("div");
+  h.className="heart";
+  h.innerText=Math.random()>0.5?"💖":"💛";
+  h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=16+Math.random()*20+"px";
+  h.style.animationDuration=4+Math.random()*3+"s";
   document.body.appendChild(h);
   setTimeout(()=>h.remove(),7000);
 },450);
