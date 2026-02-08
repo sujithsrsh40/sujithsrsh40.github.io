@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -26,14 +27,8 @@
     }
 
     @keyframes floatUp {
-      from {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-      }
-      to {
-        transform: translateY(-110vh) scale(1.5);
-        opacity: 0;
-      }
+      from { transform: translateY(0) scale(1); opacity: 1; }
+      to { transform: translateY(-110vh) scale(1.5); opacity: 0; }
     }
 
     .card {
@@ -80,9 +75,18 @@
       to { opacity: 1; transform: scale(1); }
     }
 
+    /* Button area split into two lanes */
     .buttons {
+      display: flex;
+      justify-content: space-between;
       position: relative;
-      height: 90px;
+      height: 80px;
+      margin-top: 10px;
+    }
+
+    .lane {
+      width: 48%;
+      position: relative;
     }
 
     button {
@@ -92,21 +96,19 @@
       border-radius: 30px;
       cursor: pointer;
       position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 10px;
     }
 
     #yesBtn {
       background: #ff4f7a;
       color: white;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 10px;
     }
 
     #noBtn {
       background: #ddd;
       color: #555;
-      left: 25%;
-      top: 10px;
     }
 
     .result {
@@ -121,44 +123,46 @@
 <body>
 
   <div class="card">
-    <!-- Photo appears only after YES -->
     <div class="photo" id="photo">
       <img src="photo.jpg" alt="Us 💕">
     </div>
 
     <h1>Veena 💖</h1>
-    <p>Will you be my valentine? 👉🏻👈🏻</p>
+    <p>Will you go on a date with me?</p>
 
     <div class="buttons" id="buttonBox">
-      <button id="yesBtn">Yes 💘</button>
-      <button id="noBtn">No 🙈</button>
+      <div class="lane" id="noLane">
+        <button id="noBtn">No 🙈</button>
+      </div>
+      <div class="lane">
+        <button id="yesBtn">Yes 💘</button>
+      </div>
     </div>
 
     <div class="result" id="result">
-      I knew you'd say yes! 💕🥰
+      It’s a date then! 💕🥰
     </div>
   </div>
 
   <script>
     const noBtn = document.getElementById("noBtn");
+    const noLane = document.getElementById("noLane");
     const yesBtn = document.getElementById("yesBtn");
-    const result = document.getElementById("result");
     const photo = document.getElementById("photo");
     const buttonBox = document.getElementById("buttonBox");
+    const result = document.getElementById("result");
 
-    // Keep NO button within a small safe area
+    // NO button moves ONLY inside its own lane
     function moveButton() {
-      const boxWidth = buttonBox.clientWidth;
-      const boxHeight = buttonBox.clientHeight;
-
-      const maxX = boxWidth - noBtn.offsetWidth;
-      const maxY = boxHeight - noBtn.offsetHeight;
+      const maxX = noLane.clientWidth - noBtn.offsetWidth;
+      const maxY = noLane.clientHeight - noBtn.offsetHeight;
 
       const x = Math.random() * maxX;
       const y = Math.random() * maxY;
 
-      noBtn.style.left = `${x}px`;
+      noBtn.style.left = `${x + noBtn.offsetWidth / 2}px`;
       noBtn.style.top = `${y}px`;
+      noBtn.style.transform = "translateX(0)";
     }
 
     noBtn.addEventListener("mouseenter", moveButton);
@@ -174,7 +178,7 @@
     function createHeart() {
       const heart = document.createElement("div");
       heart.className = "heart";
-      heart.innerText = "💖";
+      heart.innerText = Math.random() > 0.5 ? "💖" : "💘";
       heart.style.left = Math.random() * 100 + "vw";
       heart.style.fontSize = 16 + Math.random() * 20 + "px";
       heart.style.animationDuration = 4 + Math.random() * 3 + "s";
